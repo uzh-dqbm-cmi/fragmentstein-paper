@@ -1,0 +1,29 @@
+ID	sample	sraname	finname	diagnosis	diag	group	library	sex	Nfragments	readlength	CNVcontrol	processing
+BH01_orig	BH01	SRR2129993	EE86217	Healthy	Healthy	Healthy	dsDNA	mixed	1060.6M	101	yes	original
+IC49_orig	IC49	SRR2130046	EE86270	Pancreatic cancer	Panc ca	Cancer	dsDNA	male	122.1M	101	no	original
+IC50_orig	IC50	SRR2130047	EE86271	Pancreatic cancer	Panc ca	Cancer	dsDNA	female	149.8M	101	no	original
+IC51_orig	IC51	SRR2130048	EE86272	Pancreatic cancer	Panc ca	Cancer	dsDNA	female	143.1M	101	no	original
+IC52_orig	IC52	SRR2130049	EE86273	Pancreatic cancer	Panc ca	Cancer	dsDNA	male	145.4M	101	no	original
+IH01_orig	IH01	SRR2130050	EE86274	Healthy	Healthy	Healthy	dsDNA	male	966.5M	101	yes	original
+IA05_orig	IA05	SRR2129998	EE86222	SLE	SLE	SLE	dsDNA	female	139.5M	101	yes	original
+IA06_orig	IA06	SRR2129999	EE86223	SLE	SLE	SLE	dsDNA	female	135.1M	101	yes	original
+IA07_orig	IA07	SRR2130000	EE86224	SLE	SLE	SLE	dsDNA	male	150.4M	101	yes	original
+IA08_orig	IA08	SRR2130001	EE86225	SLE	SLE	SLE	dsDNA	male	140.6M	101	yes	original
+IC15_orig	IC15	SRR2130014	EE86238	Lung cancer	Lung ca	Cancer	ssDNA	male	601.3M	50	no	original
+IC17_orig	IC17	SRR2130016	EE86240	Liver cancer	Liver ca	Cancer	ssDNA	male	749.6M	50	no	original
+IC20_orig	IC20	SRR2130019	EE86243	Lung cancer	Lung ca	Cancer	ssDNA	male	440.7M	50	no	original
+IH02_orig	IH02	SRR2130051	EE86275	Healthy	Healthy	Healthy	ssDNA	male	474.3M	50	yes	original
+BH01_frag	BH01	SRR2129993	EE86217	Healthy	Healthy	Healthy	dsDNA	mixed	1060.6M	101	yes	Fragmentstein
+IC49_frag	IC49	SRR2130046	EE86270	Pancreatic cancer	Panc ca	Cancer	dsDNA	male	122.1M	101	no	Fragmentstein
+IC50_frag	IC50	SRR2130047	EE86271	Pancreatic cancer	Panc ca	Cancer	dsDNA	female	149.8M	101	no	Fragmentstein
+IC51_frag	IC51	SRR2130048	EE86272	Pancreatic cancer	Panc ca	Cancer	dsDNA	female	143.1M	101	no	Fragmentstein
+IC52_frag	IC52	SRR2130049	EE86273	Pancreatic cancer	Panc ca	Cancer	dsDNA	male	145.4M	101	no	Fragmentstein
+IH01_frag	IH01	SRR2130050	EE86274	Healthy	Healthy	Healthy	dsDNA	male	966.5M	101	yes	Fragmentstein
+IA05_frag	IA05	SRR2129998	EE86222	SLE	SLE	SLE	dsDNA	female	139.5M	101	yes	Fragmentstein
+IA06_frag	IA06	SRR2129999	EE86223	SLE	SLE	SLE	dsDNA	female	135.1M	101	yes	Fragmentstein
+IA07_frag	IA07	SRR2130000	EE86224	SLE	SLE	SLE	dsDNA	male	150.4M	101	yes	Fragmentstein
+IA08_frag	IA08	SRR2130001	EE86225	SLE	SLE	SLE	dsDNA	male	140.6M	101	yes	Fragmentstein
+IC15_frag	IC15	SRR2130014	EE86238	Lung cancer	Lung ca	Cancer	ssDNA	male	601.3M	50	no	Fragmentstein
+IC17_frag	IC17	SRR2130016	EE86240	Liver cancer	Liver ca	Cancer	ssDNA	male	749.6M	50	no	Fragmentstein
+IC20_frag	IC20	SRR2130019	EE86243	Lung cancer	Lung ca	Cancer	ssDNA	male	440.7M	50	no	Fragmentstein
+IH02_frag	IH02	SRR2130051	EE86275	Healthy	Healthy	Healthy	ssDNA	male	474.3M	50	yes	Fragmentstein

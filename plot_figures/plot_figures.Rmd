@@ -1,0 +1,195 @@
+---
+title: "plot_figures"
+author: "Zsolt Balázs"
+date: "24 4 2023"
+output: html_document
+---
+# Scripts used to generate the figures of the manuscript
+```{r}
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+library(ComplexHeatmap)
+library(ggpubr)
+library(ggrepel)
+library(ggbiplot)
+library(plotly)
+library(ggdendro)
+library(tidyr)
+library(grid)
+library(rstatix)
+```
+## Length distribution
+```{r}
+count <- read_tsv("length_uniqcounts.tsv")
+
+count[is.na(count)] <- 0
+ratio <- count %>% mutate_at(vars(-length), funs(./sum(.))) 
+samplemap <- read_tsv("metadata.txt")
+
+ratiolong <- melt(ratio, 
+                  id.vars=c("length"),
+                  variable.name="ID",
+                  value.name="ratio")
+
+ratiolong <- merge(x = ratiolong, y = samplemap, by = "ID", all.x = TRUE)
+```
+
+### Preparing Fragment length distribution heatmaps
+### lists of samples in the two datasets
+```{r}
+ssdna <- samplemap$ID[samplemap$library=="ssDNA"]
+dsdna <- samplemap$ID[samplemap$library=="dsDNA"]
+```
+### splitting ratio dataframe
+```{r}
+ssdnarat <- ratio[, (colnames(ratio) %in% ssdna)]
+dsdnarat <- ratio[, (colnames(ratio) %in% dsdna)]
+```
+### dividing by healthy median, merging and taking log2
+```{r}
+ssdnarat$median <- apply(ssdnarat, 1, mean, na.rm=T)
+ssdnadiv <- sweep(subset(ssdnarat, select = -c(median)),1,ssdnarat$median,'/')
+
+dsdnarat$median <- apply(dsdnarat, 1, mean, na.rm=T)
+dsdnadiv <- sweep(subset(dsdnarat, select = -c(median)),1,dsdnarat$median,'/')
+
+logmed <- cbind(ssdnadiv, dsdnadiv)
+logmed <- base::log2(logmed)
+logmed <- cbind(ratio$length, logmed)
+names(logmed)[names(logmed) == "ratio$length"] <- "length"
+longlog <- melt(logmed, 
+                id.vars=c("length"),
+                variable.name="ID",
+                value.name="log2ratio")
+longlog <- merge(x = longlog, y = samplemap, by = "ID", all.x = TRUE)
+```
+
+```{r}
+longlog$diag <- factor(longlog$diag, levels = c("Liver ca", "Lung ca", "Panc ca",
+                                                "Healthy", "SLE"))
+### for some reason sort() didn't sort these alphabetically
+idorder <- c("BH01_frag", "BH01_orig", "IA05_frag", "IA05_orig", "IA06_frag",
+             "IA06_orig", "IA07_frag", "IA07_orig", "IA08_frag", "IA08_orig",
+             "IC15_frag", "IC15_orig", "IC17_frag", "IC17_orig", "IC20_frag",
+             "IC20_orig", "IC49_frag", "IC49_orig", "IC50_frag", "IC50_orig",
+             "IC51_frag", "IC51_orig", "IC52_frag", "IC52_orig", "IH01_frag",
+             "IH01_orig", "IH02_frag", "IH02_orig")
+longlog$ID <- factor(longlog$ID, levels=idorder)
+```
+## Plot heatmap of Fig1B
+```{r}
+heatmap_plot <- ggplot(longlog[longlog$length>75,],
+                       aes(x = length, y = ID, fill = log2ratio)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "#075AFF",
+                       mid = "#FFFFCC",
+                       high = "#FF0000") +
+  theme_classic() +
+  theme(axis.text = element_text(size = 6),
+        axis.title = element_text(size = 7),
+        axis.title.y = element_blank(),
+        strip.text.y = element_text(size = 6),
+        legend.text = element_text(size = 6),
+        legend.title = element_text(size = 6),
+        legend.key.size = unit(0.3, 'cm'),
+        panel.spacing = unit(0.03, "lines")) +
+  scale_x_continuous(name="Fragment length (bp)") +
+  facet_grid(diag~., scales = "free_y", space = "free_y",
+             labeller = label_wrap_gen(width = 5))
+heatmap_plot
+```
+
+## Plot ratio of fragments between 100 and 150bp, Supplementary Fig 2
+```{r}
+rat150 <- as.data.frame(colSums(ratio[ratio$length<=150 & ratio$length>=100,][,-1]))
+colnames(rat150) <- "ratio150"
+rat150$ID <- rownames(rat150)
+rat150samp <- merge(x = rat150, y = samplemap, by = "ID", all.x = TRUE)
+
+p <- ggplot(rat150samp, aes(x=sample, y=ratio150, fill=processing)) + 
+  geom_bar(position = "dodge", stat="identity") + 
+  scale_fill_manual(values = c("darkviolet", "darkgreen")) +
+  theme_classic() + 
+  theme(legend.position = c(0.9, 0.8),
+        axis.text = element_text(size = 6),
+        axis.title = element_text(size = 6),
+        legend.text = element_text(size = 6),
+        legend.title = element_blank(),
+        strip.text.x = element_text(size = 6),
+        panel.spacing = unit(0.1, "lines"),
+        legend.key.size = unit(0.4, 'cm'),
+        legend.spacing.x = unit(0.04, 'cm')) +
+  scale_y_continuous(name="Ratio of fragments < 150bp") +
+  scale_x_discrete(name="Sample") +
+  scale_color_manual(values = c("red", "grey", "yellow")) +
+  facet_grid(.~group, scales = "free_x", space = "free_x")
+p
+```
+
+## Tumor fraction, Fig1C
+```{r}
+tf <- read_tsv("ichor_results.tsv")
+
+tf <- merge(x = tf, y = samplemap, by = "ID", all.x = TRUE)
+
+ggplot(tf, aes(x=sample, y=tf, fill=processing)) + 
+  geom_bar(position = "dodge", stat="identity") + 
+  scale_fill_manual(values = c("darkviolet", "darkgreen")) +
+  theme_classic() + 
+  theme(legend.position = c(0.9, 0.8),
+        axis.text = element_text(size = 6),
+        axis.title = element_text(size = 6),
+        legend.text = element_text(size = 6),
+        legend.title = element_blank(),
+        strip.text.x = element_text(size = 6),
+        panel.spacing = unit(0.1, "lines"),
+        legend.key.size = unit(0.4, 'cm'),
+        legend.spacing.x = unit(0.04, 'cm')) +
+  scale_y_continuous(name="Tumor fraction") +
+  scale_x_discrete(name="Sample") +
+  facet_grid(.~group, scales = "free_x", space = "free_x")
+```
+
+## LIQUORICE results Fig1D
+```{r}
+celltype <- read_tsv("LIQUORICE_results.tsv")
+ct_wide <- spread(celltype, key = cell_type, value = signature)
+ct_wide[, c(2:6)] <- scale(ct_wide[, c(2:6)])
+celltype$signature <- scale(celltype$signature)
+celltype <- pivot_longer(ct_wide, colnames(ct_wide[2:6]), 
+                         names_to = "cell_type",
+                         values_to = "signature")
+celltype_merged <- merge(x = celltype, y = samplemap, by = "ID", all.x = TRUE)
+ct_wide_merged <- merge(x = ct_wide, y = samplemap, by = "ID", all.x = TRUE)
+# Run clustering
+
+celltype_merged$diag <- factor(celltype_merged$diag, levels = c("Liver ca",
+                                                                "Lung ca",
+                                                                "Panc ca",
+                                                                "Healthy",
+                                                                "SLE"))
+
+heatmap_plot <- ggplot(celltype_merged, aes(x = cell_type, y = ID, fill = signature)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "#075AFF",
+                       mid = "#FFFFCC",
+                       high = "#FF0000") +
+  theme_classic() +
+  theme(axis.text = element_text(size = 6),
+        axis.title = element_blank(),
+        legend.text = element_text(size = 6),
+        legend.title = element_text(size = 6),
+        strip.text.y = element_text(size = 6),
+        legend.key.size = unit(0.3, 'cm'),
+        panel.spacing = unit(0.03, "lines")
+        #legend.key.size = unit(0.3, 'cm'),
+        #legend.spacing.x = unit(0.03, 'cm')
+  ) +
+  facet_grid(diag~., scales = "free_y", space = "free_y",
+             labeller = label_wrap_gen(width = 5))
+heatmap_plot
+```
+
+
