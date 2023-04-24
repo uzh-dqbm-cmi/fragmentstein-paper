@@ -156,9 +156,9 @@ ggplot(tf, aes(x=sample, y=tf, fill=processing)) +
 ```{r}
 celltype <- read_tsv("LIQUORICE_results.tsv")
 ct_wide <- spread(celltype, key = cell_type, value = signature)
-ct_wide[, c(2:6)] <- scale(ct_wide[, c(2:6)])
+ct_wide[, c(2:5)] <- scale(ct_wide[, c(2:5)])
 celltype$signature <- scale(celltype$signature)
-celltype <- pivot_longer(ct_wide, colnames(ct_wide[2:6]), 
+celltype <- pivot_longer(ct_wide, colnames(ct_wide[2:5]), 
                          names_to = "cell_type",
                          values_to = "signature")
 celltype_merged <- merge(x = celltype, y = samplemap, by = "ID", all.x = TRUE)
